@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        
+      {
+        "type": "cppdbg",
+        "request": "launch",
+        "name": "Launch Program",
+        "program": "${workspaceFolder}/${input:executableName}",
+        "preLaunchTask": "build",
+        "cwd": "${workspaceFolder}",
+        "stopAtEntry": false,
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ],
+        "miDebuggerPath": "/usr/bin/gdb",
+        "logging": {
+          "engineLogging": true
+        }
+      }
+    ],
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "executableName",
+        "description": "Name of your executable"
+      }
+    ],
+  }
+  
