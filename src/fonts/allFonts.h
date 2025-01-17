@@ -38,6 +38,8 @@
 #ifndef _allFonts_h_
 #define _allFonts_h_
 
+#include <stdint.h>
+
 #ifdef __AVR__
 #include <avr/pgmspace.h>
 /** declare a font for AVR. */

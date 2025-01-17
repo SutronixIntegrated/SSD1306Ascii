@@ -28,6 +28,7 @@
  */
 #ifndef SSD1306AsciiAvrI2c_h
 #define SSD1306AsciiAvrI2c_h
+#include <stdint.h>
 #include "SSD1306Ascii.h"
 #include "utility/AvrI2c.h"
 /**

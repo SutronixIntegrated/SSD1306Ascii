@@ -17,7 +17,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR A
+ * NY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
@@ -26,9 +27,17 @@
  * @file SSD1306Ascii.h
  * @brief Base class for ssd1306 displays.
  */
+
 #ifndef SSD1306Ascii_h
 #define SSD1306Ascii_h
-#include "Arduino.h"
+
+
+#include <stdint.h>
+#include <stddef.h>
+#include <string>
+
+using namespace std;
+
 #include "SSD1306init.h"
 #include "fonts/allFonts.h"
 //------------------------------------------------------------------------------
@@ -45,7 +54,7 @@
  * If INCLUDE_SCROLLING is nonzero, the scroll feature will included.
  */
 #ifndef INCLUDE_SCROLLING
-#define INCLUDE_SCROLLING 1
+#define INCLUDE_SCROLLING 0
 #endif  // INCLUDE_SCROLLING
 
 /** Initial scroll mode, SCROLL_MODE_OFF,
@@ -108,11 +117,7 @@
  * @param[in] rst Reset pin number.
  */
 inline void oledReset(uint8_t rst) {
-  pinMode(rst, OUTPUT);
-  digitalWrite(rst, LOW);
-  delay(10);
-  digitalWrite(rst, HIGH);
-  delay(10);
+  (void)rst;
 }
 //------------------------------------------------------------------------------
 /**
@@ -140,9 +145,8 @@ struct TickerState {
  * @class SSD1306Ascii
  * @brief SSD1306 base class
  */
-class SSD1306Ascii : public Print {
+class SSD1306Ascii {
  public:
-  using Print::write;
   SSD1306Ascii() {}
 #if INCLUDE_SCROLLING
   //----------------------------------------------------------------------------
@@ -159,13 +163,13 @@ class SSD1306Ascii : public Print {
    *
    * @param[in] lines Number of lines to scroll the window.
    */
-  void scrollDisplay(int8_t lines) { setStartLine(m_startLine + lines); }
+  void scrollDisplay(int8_t lines) { setStartLine(m_startLine + (uint8_t)lines); }
   /**
    * @brief Scroll the RAM window.
    *
    * @param[in] rows Number of rows to scroll the window.
    */
-  void scrollMemory(int8_t rows) { setPageOffset(m_pageOffset + rows); }
+  void scrollMemory(int8_t rows) { setPageOffset(m_pageOffset + (uint8_t)rows); }
   /**
    * @return true if the first display line is equal to the
    *         start of the RAM window.
@@ -451,7 +455,7 @@ class SSD1306Ascii : public Print {
    * @param[in] str Pointer to String object. Clear queue if nullptr.
    * @return false if queue is full else true.
    */
-  bool tickerText(TickerState* state, const String& str) {
+  bool tickerText(TickerState* state, const string& str) {
     return tickerText(state, str.c_str());
   }
   /**
@@ -496,4 +500,6 @@ class SSD1306Ascii : public Print {
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
 };
+
+
 #endif  // SSD1306Ascii_h

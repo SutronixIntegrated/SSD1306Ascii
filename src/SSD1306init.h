@@ -29,6 +29,8 @@
 #ifndef SSD1306init_h
 #define SSD1306init_h
 //------------------------------------------------------------------------------
+#include <stdint.h>
+
 #ifndef __AVR__
 /** Handle AVR flash addressing. */
 #define MEM_TYPE
