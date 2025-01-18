@@ -96,10 +96,9 @@ uint8_t SSD1306Ascii::fontRows() const {
   return font ? m_magFactor * ((font->height + 7) / 8) : 0;
 }
 //------------------------------------------------------------------------------
-/*
 uint16_t SSD1306Ascii::fontSize() const {
   return font ? font->charCount : 0;
-}*/
+}
 //------------------------------------------------------------------------------
 uint8_t SSD1306Ascii::fontWidth() const {
   return font ? m_magFactor * font->width : 0;
