@@ -147,7 +147,7 @@ struct TickerState {
  */
 class SSD1306Ascii {
  public:
-  SSD1306Ascii() {}
+ SSD1306Ascii(void){}
 #if INCLUDE_SCROLLING
   //----------------------------------------------------------------------------
   /**
@@ -481,6 +481,8 @@ class SSD1306Ascii {
    */
   size_t write(uint8_t ch);
 
+  void print(const char *str);
+
  protected:
   uint16_t fontSize() const;
   virtual void writeDisplay(uint8_t b, uint8_t mode) = 0;
@@ -489,14 +491,14 @@ class SSD1306Ascii {
   uint8_t m_displayWidth;   // Display width.
   uint8_t m_displayHeight;  // Display height.
   uint8_t m_colOffset;      // Column offset RAM to SEG.
-  uint8_t m_letterSpacing;  // Letter-spacing in pixels.
+  uint8_t m_letterSpacing = 1;  // Letter-spacing in pixels.
 #if INCLUDE_SCROLLING
   uint8_t m_startLine;                         // Top line of display
   uint8_t m_pageOffset;                        // Top page of RAM window.
   uint8_t m_scrollMode = INITIAL_SCROLL_MODE;  // Scroll mode for newline.
 #endif                                         // INCLUDE_SCROLLING
   uint8_t m_skip = 0;
-  const uint8_t* m_font = nullptr;  // Current font.
+  const uint8_t* m_font = lcdnums12x16;  // Current font.
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
 };

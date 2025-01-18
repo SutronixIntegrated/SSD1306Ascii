@@ -393,3 +393,11 @@ size_t SSD1306Ascii::write(uint8_t ch) {
   setRow(srow);
   return 1;
 }
+//------------------------------------------------------------------------------
+void SSD1306Ascii::print(const char *str)
+{
+    while (*str)
+    {
+        write(*str++);
+    }
+}
