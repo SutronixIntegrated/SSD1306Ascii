@@ -404,11 +404,126 @@ size_t SSD1306Ascii::write(uint8_t ch)
   setRow(srow);
   return 1;
 }
+
+//------------------------------------------------------------------------------
+size_t SSD1306Ascii::_write(uint8_t ch)
+{
+  if(font == NULL)return 0;
+  if(ch == '\r'){ setCol(0); return 1; }
+
+  uint8_t w = font->width;
+  uint8_t h = font->height;
+  uint8_t first = font->firstChar;
+  uint8_t count = font->charCount;
+
+  uint8_t nr = (h + 7) >> 3;
+
+  if(ch >= (first + count))return 0;
+
+  if(ch == '\n') 
+  {
+    setCol(0);
+    uint8_t fr = m_magFactor * nr;
+#if INCLUDE_SCROLLING
+    uint8_t dr = displayRows();
+    uint8_t tmpRow = m_row + fr;
+    int8_t delta = tmpRow + fr - dr;
+    if (m_scrollMode == SCROLL_MODE_OFF || delta <= 0) {
+      setRow(tmpRow);
+    } else {
+      m_pageOffset = (m_pageOffset + delta) & 7;
+      m_row = dr - fr;
+      // Cursor will be positioned by clearToEOL.
+      clearToEOL();
+      if (m_scrollMode == SCROLL_MODE_AUTO) {
+        setStartLine(8 * m_pageOffset);
+      }
+    }
+#else   // INCLUDE_SCROLLING
+    setRow(m_row + fr);
+#endif  // INCLUDE_SCROLLING
+    return 1;
+  }
+
+  ch -= first;
+  uint8_t s = letterSpacing();
+  uint8_t thieleShift = 0;
+  
+  const uint8_t* base = font->bitmapTable;
+
+  if(font->charOffsetTable == NULL) 
+  {
+    base += nr * w * ch;
+  } 
+  else
+  {
+    if(h & 7) 
+    {
+      thieleShift = 8 - (h & 7);
+    }
+
+    uint16_t index = font->charOffsetTable[ch];
+    w = font->charOffsetTable[ch + 1] - index;
+    base += nr * index;
+  }
+
+  uint8_t scol = m_col;
+  uint8_t srow = m_row;
+  uint8_t skip = m_skip;
+
+  for(uint8_t r = 0; r < nr; r++)
+  {
+    for(uint8_t m = 0; m < m_magFactor; m++)
+    {
+      skipColumns(skip);
+
+      if(r || m)
+      {
+        setCursor(scol, m_row + 1);
+      }
+
+      for(uint8_t c = 0; c < w; c++) 
+      {
+        uint8_t b = readFontByte(base + c + r * w);
+
+        if(thieleShift && (r + 1) == nr) 
+        {
+          b >>= thieleShift;
+        }
+
+        if(m_magFactor == 2) 
+        {
+          b = m ? b >> 4 : b & 0XF;
+          b = readFontByte(scaledNibble + b);
+          ssd1306WriteRamBuf(b);
+        }
+
+        ssd1306WriteRamBuf(b);
+      }
+
+      for(uint8_t i = 0; i < s; i++) 
+      {
+        ssd1306WriteRamBuf(0);
+      }
+    }
+  }
+
+  setRow(srow);
+  return 1;
+}
 //------------------------------------------------------------------------------
 void SSD1306Ascii::print(const char *str)
 {
     while (*str)
     {
         write(*str++);
+    }
+}
+
+void SSD1306Ascii::_print(const char *str)
+{
+    while (*str)
+    {
+        _write(*str++);
     }
 }

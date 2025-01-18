@@ -3,7 +3,7 @@
 
 #include "font.h"
 
-const uint8_t callibri10_bitmap[] = 
+static const uint8_t bitmapTable[] = 
 {
     // font data
     0x00, 0x00, 0x00, 0x00, // 0x20 <space>
@@ -119,7 +119,7 @@ static const uint8_t callibri10_widthTable[] =
     0x03, 0x03, 0x01, 0x02, 0x04, 0x04, 
 };*/
 
-const uint16_t callibri10_charOffsetTable[] = 
+static const uint16_t offsetTable[] = 
 {
     0, 2, 3, 5, 10, 15, 22, 27, 28, 30, 
     32, 35, 40, 42, 44, 45, 49, 54, 58, 62, 
@@ -137,8 +137,10 @@ font_t const font_callibri10 =
 {
     .width = 0x0A,
     .height = 0x0A,
-    .bitmapTable = callibri10_bitmap,
-    .charOffsetTable = callibri10_charOffsetTable
+    .firstChar = ' ',
+    .charCount = 96,
+    .bitmapTable = bitmapTable,
+    .charOffsetTable = offsetTable
 };
 
 #endif

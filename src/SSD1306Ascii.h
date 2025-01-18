@@ -31,7 +31,6 @@
 #ifndef SSD1306Ascii_h
 #define SSD1306Ascii_h
 
-
 #include <stdint.h>
 #include <stddef.h>
 #include <string>
@@ -40,6 +39,8 @@ using namespace std;
 
 #include "SSD1306init.h"
 #include "fonts/allFonts.h"
+#include "font.h"
+
 //------------------------------------------------------------------------------
 /** SSD1306Ascii version */
 #define SDD1306_ASCII_VERSION 10305
@@ -288,7 +289,7 @@ class SSD1306Ascii {
   /**
    * @return The current font pointer.
    */
-  const uint8_t* font() const { return m_font; }
+  //const uint8_t* font() const { return m_font; }
   /**
    * @return The count of characters in a font.
    */
@@ -473,7 +474,11 @@ class SSD1306Ascii {
    */
   size_t write(uint8_t ch);
 
+  size_t _write(uint8_t ch); 
+
   void print(const char *str);
+  
+  void _print(const char *str);
 
  protected:
   uint16_t fontSize() const;
@@ -493,7 +498,7 @@ class SSD1306Ascii {
   const uint8_t* m_font = Callibri10;  // Current font.
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
+  const font_t *font = &font_callibri10;
 };
-
 
 #endif  // SSD1306Ascii_h
