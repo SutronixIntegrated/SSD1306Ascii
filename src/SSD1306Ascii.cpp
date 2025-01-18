@@ -80,6 +80,31 @@ size_t SSD1306Ascii::fieldWidth(uint8_t n) {
   return n * (fontWidth() + letterSpacing());
 }
 //------------------------------------------------------------------------------
+uint8_t SSD1306Ascii::fontCharCount() const {
+  return font ? font->charCount : 0;
+}
+//------------------------------------------------------------------------------
+char SSD1306Ascii::fontFirstChar() const {
+  return font ? font->firstChar : 0;
+}
+//------------------------------------------------------------------------------
+uint8_t SSD1306Ascii::fontHeight() const {
+  return font ? m_magFactor * font->height : 0;
+}
+//------------------------------------------------------------------------------
+uint8_t SSD1306Ascii::fontRows() const {
+  return font ? m_magFactor * ((font->height + 7) / 8) : 0;
+}
+//------------------------------------------------------------------------------
+/*
+uint16_t SSD1306Ascii::fontSize() const {
+  return font ? font->charCount : 0;
+}*/
+//------------------------------------------------------------------------------
+uint8_t SSD1306Ascii::fontWidth() const {
+  return font ? m_magFactor * font->width : 0;
+}
+//------------------------------------------------------------------------------
 void SSD1306Ascii::init(const DevType* dev) {
   m_col = 0;
   m_row = 0;
