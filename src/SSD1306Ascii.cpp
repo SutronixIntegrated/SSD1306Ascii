@@ -410,20 +410,14 @@ size_t SSD1306Ascii::_write(uint8_t ch)
 {
   if(font == NULL)return 0;
   if(ch == '\r'){ setCol(0); return 1; }
+  else if(ch < font->firstChar || ch >= (font->firstChar + font->charCount))return 0;
 
-  uint8_t w = font->width;
-  uint8_t h = font->height;
-  uint8_t first = font->firstChar;
-  uint8_t count = font->charCount;
-
-  uint8_t nr = (h + 7) >> 3;
-
-  if(ch >= (first + count))return 0;
+  uint8_t numRows = (font->height + 7) >> 3;
 
   if(ch == '\n') 
   {
     setCol(0);
-    uint8_t fr = m_magFactor * nr;
+    uint8_t fr = m_magFactor * numRows;
 #if INCLUDE_SCROLLING
     uint8_t dr = displayRows();
     uint8_t tmpRow = m_row + fr;
@@ -445,66 +439,55 @@ size_t SSD1306Ascii::_write(uint8_t ch)
     return 1;
   }
 
-  ch -= first;
-  uint8_t s = letterSpacing();
+  ch -= font->firstChar;
   uint8_t thieleShift = 0;
   
   const uint8_t* base = font->bitmapTable;
-
-  if(font->charOffsetTable == NULL) 
+  uint8_t width;
+  
+  if(font->charOffsetTable != NULL)
   {
-    base += nr * w * ch;
-  } 
+    if(font->firstChar & 7)thieleShift = 8 - (font->firstChar & 7);
+    uint16_t index = font->charOffsetTable[ch];
+    width = font->charOffsetTable[ch + 1] - index;
+    base += numRows * index;
+  }
   else
   {
-    if(h & 7) 
-    {
-      thieleShift = 8 - (h & 7);
-    }
-
-    uint16_t index = font->charOffsetTable[ch];
-    w = font->charOffsetTable[ch + 1] - index;
-    base += nr * index;
+    base += numRows * font->width * ch;
+    width = font->width;
   }
 
   uint8_t scol = m_col;
   uint8_t srow = m_row;
   uint8_t skip = m_skip;
 
-  for(uint8_t r = 0; r < nr; r++)
+  for(uint8_t raw = 0; raw < numRows; raw++)
   {
-    for(uint8_t m = 0; m < m_magFactor; m++)
+    for(uint8_t mag = 0; mag < m_magFactor; mag++)
     {
       skipColumns(skip);
 
-      if(r || m)
+      if(raw || mag)setCursor(scol, m_row + 1);
+    
+      for(uint8_t colmn = 0; colmn < width; colmn++) 
       {
-        setCursor(scol, m_row + 1);
-      }
+        uint8_t byte = readFontByte(base + colmn + raw * width);
 
-      for(uint8_t c = 0; c < w; c++) 
-      {
-        uint8_t b = readFontByte(base + c + r * w);
-
-        if(thieleShift && (r + 1) == nr) 
-        {
-          b >>= thieleShift;
-        }
-
+        if(thieleShift && (raw + 1) == numRows)byte >>= thieleShift;
+        
         if(m_magFactor == 2) 
         {
-          b = m ? b >> 4 : b & 0XF;
-          b = readFontByte(scaledNibble + b);
-          ssd1306WriteRamBuf(b);
+          byte = mag ? byte >> 4 : byte & 0XF;
+          byte = readFontByte(scaledNibble + byte);
+          ssd1306WriteRamBuf(byte);
         }
 
-        ssd1306WriteRamBuf(b);
+        ssd1306WriteRamBuf(byte);
       }
 
-      for(uint8_t i = 0; i < s; i++) 
-      {
-        ssd1306WriteRamBuf(0);
-      }
+      uint8_t spacing = letterSpacing();
+      for(uint8_t i = 0; i < spacing; i++)ssd1306WriteRamBuf(0);
     }
   }
 
