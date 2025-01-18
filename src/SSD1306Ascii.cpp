@@ -410,7 +410,6 @@ size_t SSD1306Ascii::_write(uint8_t ch)
 {
   if(font == NULL)return 0;
   if(ch == '\r'){ setCol(0); return 1; }
-  else if(ch < font->firstChar || ch >= (font->firstChar + font->charCount))return 0;
 
   uint8_t numRows = (font->height + 7) >> 3;
 
@@ -439,12 +438,13 @@ size_t SSD1306Ascii::_write(uint8_t ch)
     return 1;
   }
 
+  if(ch < font->firstChar || ch >= (font->firstChar + font->charCount))return 0;
   ch -= font->firstChar;
-  uint8_t thieleShift = 0;
-  
-  const uint8_t* base = font->bitmapTable;
+
   uint8_t width;
-  
+  uint8_t thieleShift = 0;
+  const uint8_t* base = font->bitmapTable;
+
   if(font->charOffsetTable != NULL)
   {
     if(font->firstChar & 7)thieleShift = 8 - (font->firstChar & 7);
@@ -499,7 +499,7 @@ void SSD1306Ascii::print(const char *str)
 {
     while (*str)
     {
-        write(*str++);
+      write(*str++);
     }
 }
 
@@ -507,6 +507,6 @@ void SSD1306Ascii::_print(const char *str)
 {
     while (*str)
     {
-        _write(*str++);
+      _write(*str++);
     }
 }

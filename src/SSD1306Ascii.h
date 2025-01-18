@@ -498,7 +498,7 @@ class SSD1306Ascii {
   const uint8_t* m_font = Callibri10;  // Current font.
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
-  const font_t *font = &font_callibri10;
+  const font_t *font = &font_5x7;
 };
 
 #endif  // SSD1306Ascii_h
