@@ -8,7 +8,7 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/mnt/c/Users/Rakesh_Suthar/Downloads/SSD1306Ascii/src",
+      "cwd": "/mnt/c/Users/Rakesh_Suthar/Downloads/SSD1306Ascii/src/",
       "program": "/mnt/c/Users/Rakesh_Suthar/Downloads/SSD1306Ascii/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",

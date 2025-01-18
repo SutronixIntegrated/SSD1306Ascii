@@ -306,7 +306,7 @@ size_t SSD1306Ascii::write(uint8_t ch)
 
   uint8_t w = readFontByte(m_font + FONT_WIDTH);
   uint8_t h = readFontByte(m_font + FONT_HEIGHT);
-  uint8_t nr = (h + 7) >>3;
+  uint8_t nr = (h + 7) >> 3;
   uint8_t first = readFontByte(m_font + FONT_FIRST_CHAR);
   uint8_t count = readFontByte(m_font + FONT_CHAR_COUNT);
   const uint8_t* base = m_font + FONT_WIDTH_TABLE;

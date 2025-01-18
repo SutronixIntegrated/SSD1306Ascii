@@ -490,7 +490,7 @@ class SSD1306Ascii {
   uint8_t m_scrollMode = INITIAL_SCROLL_MODE;  // Scroll mode for newline.
 #endif                                         // INCLUDE_SCROLLING
   uint8_t m_skip = 0;
-  const uint8_t* m_font = TimesNewRoman13;  // Current font.
+  const uint8_t* m_font = Callibri10;  // Current font.
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
 };
