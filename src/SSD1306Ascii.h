@@ -473,12 +473,8 @@ class SSD1306Ascii {
    * @return one for success else zero.
    */
   size_t write(uint8_t ch);
-
-  size_t _write(uint8_t ch); 
-
-  void print(const char *str);
   
-  void _print(const char *str);
+  void print(const char *str);
 
  protected:
   uint16_t fontSize() const;
