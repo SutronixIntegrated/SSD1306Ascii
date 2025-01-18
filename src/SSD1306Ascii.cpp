@@ -299,22 +299,22 @@ int8_t SSD1306Ascii::tickerTick(TickerState* state) {
   return state->nQueue;
 }
 //------------------------------------------------------------------------------
-size_t SSD1306Ascii::write(uint8_t ch) {
-  if (!m_font) {
-    return 0;
-  }
+size_t SSD1306Ascii::write(uint8_t ch)
+{
+  if(m_font == NULL)return 0;
+  if(ch == '\r'){ setCol(0); return 1; }
+
   uint8_t w = readFontByte(m_font + FONT_WIDTH);
   uint8_t h = readFontByte(m_font + FONT_HEIGHT);
-  uint8_t nr = (h + 7) / 8;
+  uint8_t nr = (h + 7) >>3;
   uint8_t first = readFontByte(m_font + FONT_FIRST_CHAR);
   uint8_t count = readFontByte(m_font + FONT_CHAR_COUNT);
   const uint8_t* base = m_font + FONT_WIDTH_TABLE;
 
-  if (ch == '\r') {
-    setCol(0);
-    return 1;
-  }
-  if (ch == '\n') {
+  if(ch >= (first + count))return 0;
+
+  if(ch == '\n') 
+  {
     setCol(0);
     uint8_t fr = m_magFactor * nr;
 #if INCLUDE_SCROLLING
@@ -337,55 +337,66 @@ size_t SSD1306Ascii::write(uint8_t ch) {
 #endif  // INCLUDE_SCROLLING
     return 1;
   }
-  bool nfSpace = false;
-  if (first <= ch && ch < (first + count)) {
-    ch -= first;
-  } else if (ENABLE_NONFONT_SPACE && ch == ' ') {
-    nfSpace = true;
-  } else {
-    // Error if not in font.
-    return 0;
-  }
+
+  ch -= first;
   uint8_t s = letterSpacing();
   uint8_t thieleShift = 0;
-  if (nfSpace) {
-    // non-font space.
-  } else if (fontSize() < 2) {
+
+  if(fontSize() < 2) 
+  {
     // Fixed width font.
     base += nr * w * ch;
-  } else {
-    if (h & 7) {
+  } 
+  else
+  {
+    if(h & 7) 
+    {
       thieleShift = 8 - (h & 7);
     }
+
     uint16_t index = 0;
-    for (uint8_t i = 0; i < ch; i++) {
+    for(uint8_t i = 0; i < ch; i++) 
+    {
       index += readFontByte(base + i);
     }
+
     w = readFontByte(base + ch);
     base += nr * index + count;
   }
+
   uint8_t scol = m_col;
   uint8_t srow = m_row;
   uint8_t skip = m_skip;
-  for (uint8_t r = 0; r < nr; r++) {
-    for (uint8_t m = 0; m < m_magFactor; m++) {
+
+  for(uint8_t r = 0; r < nr; r++)
+  {
+    for (uint8_t m = 0; m < m_magFactor; m++)
+    {
       skipColumns(skip);
-      if (r || m) {
+      if (r || m) 
+      {
         setCursor(scol, m_row + 1);
       }
-      for (uint8_t c = 0; c < w; c++) {
-        uint8_t b = nfSpace ? 0 : readFontByte(base + c + r * w);
-        if (thieleShift && (r + 1) == nr) {
+
+      for (uint8_t c = 0; c < w; c++) 
+      {
+        uint8_t b = readFontByte(base + c + r * w);
+        if (thieleShift && (r + 1) == nr) 
+        {
           b >>= thieleShift;
         }
-        if (m_magFactor == 2) {
+
+        if (m_magFactor == 2) 
+        {
           b = m ? b >> 4 : b & 0XF;
           b = readFontByte(scaledNibble + b);
           ssd1306WriteRamBuf(b);
         }
         ssd1306WriteRamBuf(b);
       }
-      for (uint8_t i = 0; i < s; i++) {
+
+      for (uint8_t i = 0; i < s; i++) 
+      {
         ssd1306WriteRamBuf(0);
       }
     }

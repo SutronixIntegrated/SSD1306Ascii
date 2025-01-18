@@ -63,14 +63,6 @@ using namespace std;
 #define INITIAL_SCROLL_MODE SCROLL_MODE_OFF
 #endif  // INITIAL_SCROLL_MODE
 
-/**
- * If ENABLE_NONFONT_SPACE is nonzero, a space of width FONT_WIDTH will
- * be enabled in fonts which do not have an encoding for 0X20, space.
- */
-#ifndef ENABLE_NONFONT_SPACE
-#define ENABLE_NONFONT_SPACE 1
-#endif  // ENABLE_NONFONT_SPACE
-
 /** Dimension of TickerState pointer queue */
 #ifndef TICKER_QUEUE_DIM
 #define TICKER_QUEUE_DIM 6
@@ -498,7 +490,7 @@ class SSD1306Ascii {
   uint8_t m_scrollMode = INITIAL_SCROLL_MODE;  // Scroll mode for newline.
 #endif                                         // INCLUDE_SCROLLING
   uint8_t m_skip = 0;
-  const uint8_t* m_font = lcdnums12x16;  // Current font.
+  const uint8_t* m_font = TimesNewRoman13;  // Current font.
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
 };
