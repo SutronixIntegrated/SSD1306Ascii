@@ -55,7 +55,7 @@ using namespace std;
  * If INCLUDE_SCROLLING is nonzero, the scroll feature will included.
  */
 #ifndef INCLUDE_SCROLLING
-#define INCLUDE_SCROLLING 0
+#define INCLUDE_SCROLLING 1
 #endif  // INCLUDE_SCROLLING
 
 /** Initial scroll mode, SCROLL_MODE_OFF,
@@ -120,7 +120,7 @@ inline void oledReset(uint8_t rst) {
 struct TickerState {
   const char* queue[TICKER_QUEUE_DIM];  ///< Queue of text pointers.
   uint8_t nQueue = 0;                   ///< Count of pointers in queue.
-  const uint8_t* font = nullptr;        ///< Font for ticker.
+  const font_t* font = nullptr;        ///< Font for ticker.
   bool mag2X;                           ///< Use mag2X if true.
   uint8_t row;                          ///< Row for ticker
   uint8_t bgnCol;                       ///< Begin column of ticker.
@@ -381,7 +381,7 @@ class SSD1306Ascii {
    *
    * @param[in] font Pointer to a font table.
    */
-  void setFont(const uint8_t* font);
+  void setFont(const font_t* font);
   /**
    * @brief Set letter-spacing.  setFont() will restore default letter-spacing.
    *
@@ -439,7 +439,7 @@ class SSD1306Ascii {
    * @param[in] bgnCol First column of ticker. Default is zero.
    * @param[in] endCol Last column of ticker. Default is last column of display.
    */
-  void tickerInit(TickerState* state, const uint8_t* font, uint8_t row,
+  void tickerInit(TickerState* state, const font_t *fnt, uint8_t row,
                   bool mag2X = false, uint8_t bgnCol = 0, uint8_t endCol = 255);
   /**
    *  @brief Add text pointer to display queue.
@@ -491,7 +491,6 @@ class SSD1306Ascii {
   uint8_t m_scrollMode = INITIAL_SCROLL_MODE;  // Scroll mode for newline.
 #endif                                         // INCLUDE_SCROLLING
   uint8_t m_skip = 0;
-  const uint8_t* m_font = Callibri10;  // Current font.
   uint8_t m_invertMask = 0;         // font invert mask
   uint8_t m_magFactor = 1;          // Magnification factor.
   const font_t *font = &font_5x7;

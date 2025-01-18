@@ -24,21 +24,18 @@
  */
 #include "SSD1306Ascii.h"
 //------------------------------------------------------------------------------
-uint8_t SSD1306Ascii::charWidth(uint8_t c) const {
-  if (!m_font) {
-    return 0;
+uint8_t SSD1306Ascii::charWidth(uint8_t ch) const
+ {
+  if(font == NULL)return 0;
+  if (ch < font->firstChar || ch >= (font->firstChar + font->charCount))return 0;
+  ch -= font->firstChar;
+  
+  if(font->charOffsetTable != NULL)
+  {
+    uint16_t index = font->charOffsetTable[ch];
+    return font->charOffsetTable[ch + 1] - index;
   }
-  uint8_t first = readFontByte(m_font + FONT_FIRST_CHAR);
-  uint8_t count = readFontByte(m_font + FONT_CHAR_COUNT);
-  if (c < first || c >= (first + count)) {
-    return 0;
-  }
-  if (fontSize() > 1) {
-    // Proportional font.
-    return m_magFactor * readFontByte(m_font + FONT_WIDTH_TABLE + c - first);
-  }
-  // Fixed width font.
-  return m_magFactor * readFontByte(m_font + FONT_WIDTH);
+  else return m_magFactor * font->width;
 }
 //------------------------------------------------------------------------------
 void SSD1306Ascii::clear() {
@@ -83,31 +80,6 @@ size_t SSD1306Ascii::fieldWidth(uint8_t n) {
   return n * (fontWidth() + letterSpacing());
 }
 //------------------------------------------------------------------------------
-uint8_t SSD1306Ascii::fontCharCount() const {
-  return m_font ? readFontByte(m_font + FONT_CHAR_COUNT) : 0;
-}
-//------------------------------------------------------------------------------
-char SSD1306Ascii::fontFirstChar() const {
-  return m_font ? readFontByte(m_font + FONT_FIRST_CHAR) : 0;
-}
-//------------------------------------------------------------------------------
-uint8_t SSD1306Ascii::fontHeight() const {
-  return m_font ? m_magFactor * readFontByte(m_font + FONT_HEIGHT) : 0;
-}
-//------------------------------------------------------------------------------
-uint8_t SSD1306Ascii::fontRows() const {
-  return m_font ? m_magFactor * ((readFontByte(m_font + FONT_HEIGHT) + 7) / 8)
-                : 0;
-}
-//------------------------------------------------------------------------------
-uint16_t SSD1306Ascii::fontSize() const {
-  return (readFontByte(m_font) << 8) | readFontByte(m_font + 1);
-}
-//------------------------------------------------------------------------------
-uint8_t SSD1306Ascii::fontWidth() const {
-  return m_font ? m_magFactor * readFontByte(m_font + FONT_WIDTH) : 0;
-}
-//------------------------------------------------------------------------------
 void SSD1306Ascii::init(const DevType* dev) {
   m_col = 0;
   m_row = 0;
@@ -150,13 +122,9 @@ void SSD1306Ascii::setCursor(uint8_t col, uint8_t row) {
   setRow(row);
 }
 //------------------------------------------------------------------------------
-void SSD1306Ascii::setFont(const uint8_t* font) {
-  m_font = font;
-  if (font && fontSize() == 1) {
-    m_letterSpacing = 0;
-  } else {
-    m_letterSpacing = 1;
-  }
+void SSD1306Ascii::setFont(const font_t *fnt) {
+  font = fnt;
+  //m_letterSpacing = 0; // impliment this
 }
 //------------------------------------------------------------------------------
 void SSD1306Ascii::setRow(uint8_t row) {
@@ -213,17 +181,19 @@ size_t SSD1306Ascii::strWidth(const char* str) const {
   return sw;
 }
 //------------------------------------------------------------------------------
-void SSD1306Ascii::tickerInit(TickerState* state, const uint8_t* font,
+void SSD1306Ascii::tickerInit(TickerState* state, const font_t *fnt,
                               uint8_t row, bool mag2X, uint8_t bgnCol,
                               uint8_t endCol) {
-  state->font = font;
+  // Initialize the ticker state with the specified parameters
+  state->font = fnt;
   state->row = row;
   state->mag2X = mag2X;
   state->bgnCol = bgnCol;
   state->endCol = endCol < m_displayWidth ? endCol : m_displayWidth - 1;
   state->nQueue = 0;
 }
-//------------------------------------------------------------------------------
+
+// Add a new text string to the ticker queue
 bool SSD1306Ascii::tickerText(TickerState* state, const char* text) {
   if (!text) {
     state->nQueue = 0;
@@ -238,7 +208,8 @@ bool SSD1306Ascii::tickerText(TickerState* state, const char* text) {
   state->queue[state->nQueue++] = text;
   return true;
 }
-//------------------------------------------------------------------------------
+
+// Update the ticker state and scroll the text
 int8_t SSD1306Ascii::tickerTick(TickerState* state) {
   if (!state->font) {
     return -1;
